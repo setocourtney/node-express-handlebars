@@ -5,8 +5,18 @@ const router = express.Router();
 
 router.get("/", (req, res) => {
     burger.selectAll((data) => {
+        let picked = [];
+        let eaten = [];
+        data.forEach((burger) => {
+            if (burger.devoured) {
+                eaten.push(burger);
+            } else {
+                picked.push(burger);
+            }
+        });
         let burgerObj = {
-            burgers: data
+            burgers_picked: picked,
+            burgers_eaten: eaten
         };
         res.render("index", burgerObj);
     })
@@ -19,10 +29,7 @@ router.post("/api/burgers", (req, res) => {
 })
 
 router.put("/api/burgers/:id", (req, res) => {
-    let newBurg = {
-        burger_name: req.params.burger_name
-    };
-    burger.updateOne(newBurg, req.params.id, (data) => {
+    burger.updateOne(true, req.params.id, (data) => {
         if (data.changedRows == 0) {
             return res.status(404).end();
         } else {
